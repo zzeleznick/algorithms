@@ -92,7 +92,7 @@ def testcase(func):
         globals()['_tests'].append((func, (), {}))
     return wrapper
 
-def call_tests(verbose=True):
+def call_tests(indices=[], verbose=True):
     """Assumed to be called once"""
     parser = argparse.ArgumentParser()
     group = parser.add_mutually_exclusive_group()
@@ -102,6 +102,8 @@ def call_tests(verbose=True):
     override_print()
     tests = globals().get('_tests', [])
     for (i, (fnc, args, kwargs)) in enumerate(tests):
+        if indices and i not in indices:
+            continue
         print("[---- %s (%s) ----]" % (fnc.__name__, i), level=1)
         if cmd_args.verbose: # verbosity is default
             pass

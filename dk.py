@@ -22,9 +22,32 @@ def get_path(prevs, goal, start):
         cur = node
     return (path[start], path.keys()[::-1])
 
-@timer
 def search(g, start, goal):
-    """Finds the closest path u->v on graph g"""
+    """Finds the closest path u->v on graph g
+    if the path DNE:
+        return (0, None)
+    else:
+        return (cost, path)
+    """
+    return dijkstra(g, start, goal)
+
+@timer
+def dijkstra(g, start, goal=None):
+    """
+    Finds the closest distances from u->(v in V) in graph g
+    Returns either a cost for one path, or all costs and
+    a dict from which paths (u->v) can be found.
+    -----------------------------------------------------
+    if goal:
+       return cost, path
+    else:
+      return costs, prevs
+    -----------------------------------------------------
+    Data Structures:
+    visited: which vertices have been visited
+    costs: min cost from u->v (v,w)
+    prevs: min edge u from v with weight w (w,v)
+    """
     visited = OD()
     costs = {v: float('inf') for v in g.vertices }
     prevs = {v: (0, None) for v in g.vertices }
@@ -32,7 +55,7 @@ def search(g, start, goal):
     heappush(fringe, (0, start))
     while fringe:
         cost, node = heappop(fringe) # pop the min element
-        if node == goal:
+        if goal != None and node == goal:
             print("Visited %s nodes" % len(visited))
             return get_path(prevs, goal, start)
         if node in visited:
@@ -44,10 +67,11 @@ def search(g, start, goal):
                 costs[v] = next_cost
                 prevs[v] = (w, node)
                 heappush(fringe, (next_cost, v))
-    print("No path found from %s -> %s" % (start, goal))
-    return (0, None)
+    print("Visited %s nodes" % len(visited))
+    return (costs, prevs)
 
 @testcase
+@timer
 def test():
     g = TimeableGraph([Vertex(i) for i in range(10)])
     g.add_edge(0, 8, 8)
@@ -84,6 +108,20 @@ def test():
 
 @testcase
 def test_2():
+    sizes = [100, 10**3, 10**4, 2*10**4, 4*10**4]
+    for s in (sizes):
+        random.seed(10)
+        TimeableGraph.set_weight_range(1,s)
+        g = TimeableGraph.generate(s, 10*s)
+        u,v = random.randint(0,50), random.randint(0,50)
+        print("Running dijkstra from %s " % (u))
+        costs, prevs = dijkstra(g, u)
+        print("Searching for the shortest path %s --> %s" % (u,v))
+        cost, path = get_path(prevs, v, u)
+        print("Found path with cost %s\nPath: %s" % (cost, path))
+
+@testcase
+def test_3():
     sizes = [100, 10**3, 10**4, 5*10**4]
     for s in (sizes):
         random.seed(10)
@@ -94,8 +132,9 @@ def test_2():
         cost, path = search(g, u, v)
         print("Found path with cost %s\nPath: %s" % (cost, path))
 
+
 if __name__ == '__main__':
     # test()
     # test_2()
-    call_tests(verbose=False)
+    call_tests([2], verbose=False)
     show_stack()
