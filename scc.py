@@ -52,11 +52,12 @@ def tarjan(g):
         if indices.get(v.name) == None:
             visit(v)
     # End Visit Routine
-    print("Indices:\n%s" % indices)
-    print("Lowlinks:\n%s" % lowlinks)
+    # print("Indices:\n%s" % indices)
+    # print("Lowlinks:\n%s" % lowlinks)
     return result
 
 @testcase
+@timer
 def test():
     g = TimeableGraph([Vertex(i) for i in range(8)])
     g.add_edge(0, 1)
@@ -74,6 +75,7 @@ def test():
     print("Result:\n%s" % res)
 
 @testcase
+@timer
 def test_2():
     names = ["A", "B", "C", "D", "E", "F", "G", "H"]
     g = TimeableGraph([Vertex(i) for i in names])
@@ -95,7 +97,21 @@ def test_2():
 def test_3():
     print("Hi")
 
+@testcase
+@timer
+def test_4():
+    print("DERP")
+    time.sleep(1)
+
+@testcase
+@timer
+def test_5():
+    g = TimeableGraph.generate(5*10**3, 10**3)
+    print("Searching for scc on g")
+    res = tarjan(g)
+
 if __name__ == '__main__':
     # test()
     # test_2()
     call_tests(verbose=False)
+    show_stack()

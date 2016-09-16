@@ -98,3 +98,4 @@ if __name__ == '__main__':
     # test()
     # test_2()
     call_tests(verbose=False)
+    show_stack()
