@@ -2,6 +2,7 @@ from __future__ import print_function
 import time
 import argparse
 import collections
+import random
 from bisect import bisect_left, insort_left
 from math import log, ceil
 from functools import wraps
@@ -78,6 +79,24 @@ def timer(func):
             result = func(*args, **kwargs)
         return result
     return wrapper
+
+def rand_arr_benchmark(func, sizes = [100, 1000, 10000]):
+    @wraps(func) # meta-data capture
+    def benchmark(size, **kwargs):
+        arr = list(range(size))
+        random.shuffle(arr)
+        start = time.time()
+        result = func(arr, **kwargs)
+        end = time.time()
+        return ((end - start), result)
+    def run(**kwargs):
+        results = []
+        for size in sizes:
+            delta, res = benchmark(size, **kwargs)
+            print("Size: %s\t Item/ms: %s" % (size, size/(1000*delta)) )
+            results.append((delta,res))
+        return results
+    return run
 
 def testcase(func):
     @wraps(func)
