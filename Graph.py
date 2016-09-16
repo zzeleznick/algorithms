@@ -219,5 +219,6 @@ def test_reverse_2():
         g.reverse()
 
 if __name__ == '__main__':
-    # test_reverse()
-    test_reverse_2()
+    test_reverse_2 = testcase(test_reverse_2)
+    call_tests()
+    show_stack()
