@@ -14,6 +14,7 @@ def search(g, start, goal):
     """Finds the closest path u->v on graph g"""
     State = namedtuple("State", ["node", "path"])
     visited = OD()
+    costs = {v: float('inf') for v in g.vertices }
     fringe = []
     state = State(start, [start])
     heappush(fringe, (0, state))
@@ -23,12 +24,15 @@ def search(g, start, goal):
         if node == goal:
             print("Visited %s nodes" % len(visited))
             return (cost, state.path)
+        if node in visited:
+            continue
         visited[node] = True
         for (v, w) in g[node].edges.iteritems():
-            if visited.get(v):
-                continue
+            next_cost = cost+w
             next_state = State(v, list(chain(state.path, [v])))
-            heappush(fringe, (cost+w, next_state))
+            if next_cost <= costs[v]:
+                costs[v] = min(costs[v], next_cost)
+                heappush(fringe, (next_cost, next_state))
     print("No path found from %s -> %s" % (start, goal))
     return (0, None)
 
