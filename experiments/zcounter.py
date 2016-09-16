@@ -4,9 +4,11 @@ from math import ceil
 from bisect import bisect_left
 from collections import deque as _deque
 from collections import Counter, namedtuple
+from treap import treap as Treap
 # Internal python modules
 import init
 from TimeUtils import *
+
 
 class zcounter(Counter):
     """A counter that keeps all its elements in order
@@ -187,32 +189,29 @@ def benchmark_native():
 
 @testcase
 @timer
-def zcounter_add_n_items(n):
+def zcounter_add_n_items(n=100):
     arr = list(range(1000))
     random.shuffle(arr)
     ctr = zcounter(arr)
     for i in range(n):
         r = random.randint(1000,2000)
         ctr.update([r])
-        r2 = random.randint(1000,2000)
-        if r2 in ctr:
-            ctr.pop(r2)
     return ctr
 
 @testcase
 @timer
-def native_add_n_items(n):
+def native_add_n_items(n=100):
     arr = list(range(1000))
     random.shuffle(arr)
     sorted(arr)
     for i in range(n):
         r = random.randint(1000,2000)
         arr.extend([r])
-        arr.pop()
         sorted(arr)
 
+@testcase
 @timer
-def treap_add_n_items(n):
+def treap_add_n_items(n=100):
     arr = list(range(1000))
     random.shuffle(arr)
     t = Treap()
@@ -221,9 +220,6 @@ def treap_add_n_items(n):
     for i in range(n):
         r = random.randint(1000,2000)
         t[r] = 1
-        r2 = random.randint(0,1000)
-        if r2 in t:
-           t.remove(r2)
     return t
 
 
@@ -231,8 +227,7 @@ if __name__ == '__main__':
     # benchmark_zcounter()
     # benchmark_native_counter()
     # benchmark_native()
-    native_add_n_items(400)
-    ctr = zcounter_add_n_items(400)
-    # t = treap_add_n_items(400)
-    # print(list(ctr.elements()))
+    # native_add_n_items(400)
+    # ctr = zcounter_add_n_items(400)
+    call_tests([4,5,6], verbose=False)
     show_stack()

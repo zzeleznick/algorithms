@@ -7,6 +7,8 @@ from heapq import *
 from Graph import *
 from TimeUtils import *
 
+# from experiments.queue import queue_insert
+
 def get_path(prevs, goal, start):
     """Gets the path from start to goal using prev"""
     path = OD({goal: 0})
@@ -51,8 +53,10 @@ def dijkstra(g, start, goal=None):
     prevs = {v: (0, None) for v in g.vertices }
     fringe = []
     heappush(fringe, (0, start))
+    # fringe = deque([(0, start)])
     while fringe:
         cost, node = heappop(fringe) # pop the min element
+        # cost, node = fringe.popleft()
         if goal != None and node == goal:
             print("Visited %s nodes" % len(visited))
             return get_path(prevs, goal, start)
@@ -65,6 +69,7 @@ def dijkstra(g, start, goal=None):
                 costs[v] = next_cost
                 prevs[v] = (w, node)
                 heappush(fringe, (next_cost, v))
+                # queue_insert(fringe, (next_cost, v), key=lambda x: x[0])
     print("Visited %s nodes" % len(visited))
     return (costs, prevs)
 
