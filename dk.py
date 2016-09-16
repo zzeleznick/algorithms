@@ -9,30 +9,41 @@ from heapq import *
 from Graph import *
 from TimeUtils import *
 
+def get_path(prevs, goal, start):
+    """Gets the path from start to goal using prev"""
+    path = OD({goal: 0})
+    cur = goal
+    while cur != start:
+        (cost, node) = prevs.get(cur)
+        if node == None or node in path:
+            print("ERROR: No path found from %s -> %s" % (start, goal))
+            return (0, None)
+        path[node] = path[cur] + cost
+        cur = node
+    return (path[start], path.keys()[::-1])
+
 @timer
 def search(g, start, goal):
     """Finds the closest path u->v on graph g"""
-    State = namedtuple("State", ["node", "path"])
     visited = OD()
     costs = {v: float('inf') for v in g.vertices }
+    prevs = {v: (0, None) for v in g.vertices }
     fringe = []
-    state = State(start, [start])
-    heappush(fringe, (0, state))
+    heappush(fringe, (0, start))
     while fringe:
-        cost, state = heappop(fringe) # pop the min element
-        node = state.node
+        cost, node = heappop(fringe) # pop the min element
         if node == goal:
             print("Visited %s nodes" % len(visited))
-            return (cost, state.path)
+            return get_path(prevs, goal, start)
         if node in visited:
             continue
         visited[node] = True
         for (v, w) in g[node].edges.iteritems():
             next_cost = cost+w
-            next_state = State(v, list(chain(state.path, [v])))
-            if next_cost <= costs[v]:
-                costs[v] = min(costs[v], next_cost)
-                heappush(fringe, (next_cost, next_state))
+            if next_cost < costs[v]:
+                costs[v] = next_cost
+                prevs[v] = (w, node)
+                heappush(fringe, (next_cost, v))
     print("No path found from %s -> %s" % (start, goal))
     return (0, None)
 
