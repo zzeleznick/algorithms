@@ -1,26 +1,14 @@
 from __future__ import print_function
 import random
-from collections import deque, namedtuple, Counter
+from collections import deque
 from collections import OrderedDict as OD
 from heapq import *
 
 from Graph import *
 from TimeUtils import *
+from utils import *
 
 # from experiments.queue import queue_insert
-
-def get_path(prevs, goal, start):
-    """Gets the path from start to goal using prev"""
-    path = OD({goal: 0})
-    cur = goal
-    while cur != start:
-        (cost, node) = prevs.get(cur)
-        if node == None or node in path:
-            print("ERROR: No path found from %s -> %s" % (start, goal))
-            return (0, None)
-        path[node] = path[cur] + cost
-        cur = node
-    return (path[start], path.keys()[::-1])
 
 def search(g, start, goal):
     """Finds the closest path u->v on graph g
