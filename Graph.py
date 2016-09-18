@@ -1,33 +1,10 @@
 from __future__ import print_function
-import os
 import random
 from itertools import chain
 from collections import OrderedDict as OD
-from collections import namedtuple
+
 from TimeUtils import *
-
-OUTPUT_FOLDER = 'output/'
-
-def yielder(scalar, n):
-    for i in xrange(n):
-        yield scalar
-
-def interject(tuplist, scalar, first=True):
-    if not tuplist:
-        return []
-    if first:
-        return [ ((s, t[0]), t[1]) for t,s in zip(tuplist, yielder(scalar, len(tuplist))) ]
-    return [ ((t[0], s), t[1]) for t,s in zip(tuplist, yielder(scalar, len(tuplist))) ]
-
-class FileManager(object):
-    dest = OUTPUT_FOLDER
-    if not os.path.exists(dest):
-        os.mkdir(dest)
-    home = os.getcwd()
-    def __enter__(self):
-        os.chdir(self.dest)
-    def __exit__(self, type, value, traceback):
-        os.chdir(self.home)
+from utils import *
 
 class Vertex(object):
     """A representation of a node with potential edges and weights.
@@ -124,15 +101,8 @@ class Graph(object):
         style = lambda u, v, w: "\t%s-->%s;" % (u, v) if w == 1 else "\t%s -- %s -->%s;" % (u, w, v)
         row_gen = lambda u: "\n".join(style(u.name, v, w) for (v,w) in u.edges.items()) if u.edges else "\t%s" % u.name
         full_gen = lambda: "\n".join("%s" % r for r in (row_gen(v) for v in self._vertices.itervalues()) if r)
-        with FileManager():
-            idx = "%s" % len([name for name in os.listdir(os.getcwd()) if name.endswith(".md")])
-            fname = "testGraph-%s%s.md" % ( "0" * (2-len(idx)), idx )
-            rpath = fname + ".png"
-            with open(fname, "w") as outfile:
-                outfile.write("graph TD;\n")
-                outfile.write(full_gen())
-            os.system("mermaid %s > /dev/null" % fname)
-            os.system("open %s" % rpath)
+        with FileManager() as FM:
+            FM.display(full_gen)
     @classmethod
     def set_weight_range(cls, low=1, hi=1):
         cls.w_min, cls.w_max = low, hi
@@ -176,12 +146,7 @@ class ReversibleGraph(Graph):
         self.remove_all_edges()
         # now add the reversed edges
         for ((u,v), w) in edges:
-            self.add_edge(u, v, w)
-    def _get_mono_edgelist(self, v):
-        """Gets edges ((u,v), w) for one vertex u"""
-        if self._reversed:
-            return interject(v.edges.items(), v.name, first=False)
-        return interject(v.edges.items(), v.name)
+            self.add_edge(v, u, w)
 
 class TimeableGraph(ReversibleGraph):
     @classmethod
