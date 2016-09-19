@@ -8,7 +8,7 @@ from Graph import *
 from TimeUtils import *
 from utils import *
 
-# from experiments.queue import PriorityQueue
+from experiments.queue import PriorityQueue
 
 def search(g, start, goal):
     """Finds the closest path u->v on graph g
@@ -41,8 +41,11 @@ def dijkstra(g, start, goal=None):
     prevs = {v: (0, None) for v in g.vertices }
     fringe = []
     heappush(fringe, (0, start))
+    # costs[start] = 0
+    # fringe = PriorityQueue(costs)
     while fringe:
         cost, node = heappop(fringe) # pop the min element
+        # cost, node = fringe.pop()
         if goal != None and node == goal:
             print("Visited %s nodes" % len(visited))
             return get_path(prevs, goal, start)
@@ -55,6 +58,7 @@ def dijkstra(g, start, goal=None):
                 costs[v] = next_cost
                 prevs[v] = (w, node)
                 heappush(fringe, (next_cost, v))
+                # fringe[v] = next_cost
     print("Visited %s nodes" % len(visited))
     return (costs, prevs)
 
@@ -123,5 +127,5 @@ def test_3():
 if __name__ == '__main__':
     # test()
     # test_2()
-    call_tests([2], verbose=False)
+    call_tests([1], verbose=False)
     show_stack()
