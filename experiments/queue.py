@@ -1,7 +1,51 @@
-from collections import deque
+import itertools
+from heapq import *
+from collections import deque, namedtuple, Mapping
+from collections import OrderedDict as OD
 # Internal python modules
 import init
 from TimeUtils import *
+
+class PriorityQueue(object):
+    NULL = '<null-item>' # placeholder for a removed item
+    def __init__(self, items=[]):
+        self.heap = []   # list of items arranged in a heap
+        self.mapping = OD() # mapping of items to heap
+        self.counter = itertools.count() # unique sequence count
+        if isinstance(items, Mapping):
+            [ self.insert(k,v) for (k,v) in items.iteritems() ]
+        else:
+            [ self.insert(k) for (k) in items]
+    def __repr__(self):
+        return repr(self.heap)
+    def __len__(self):
+        return len(self.mapping)
+    def __iter__(self):
+        return iter(self.mapping)
+    def __getitem__(self, key):
+        return self.mapping[key]
+    def __setitem__(self, key, value):
+        self.insert(key, value)
+    def insert(self, item, priority=0):
+        'Add a new item or update the priority of an existing item'
+        if item in self.mapping:
+            self.remove(item)
+        count = next(self.counter)
+        entry = [priority, count, item]
+        self.mapping[item] = entry
+        heappush(self.heap, entry)
+    def remove(self, item):
+        'Mark an existing item as NULL.  Raise KeyError if not found.'
+        entry = self.mapping.pop(item)
+        entry[-1] = self.NULL
+    def pop(self):
+        'Remove and return the lowest priority item. Raise KeyError if empty.'
+        while self.heap:
+            priority, count, item = heappop(self.heap)
+            if item is not self.NULL:
+                del self.mapping[item]
+                return (priority, item)
+        raise KeyError('pop from an empty priority queue')
 
 def bisect_left(a, x, lo=0, hi=None, key=None):
     if lo < 0:
