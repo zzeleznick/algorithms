@@ -1,6 +1,5 @@
 from __future__ import print_function
 import random
-from collections import defaultdict
 from collections import OrderedDict as OD
 from heapq import *
 
@@ -40,8 +39,7 @@ def k_bellman_ford(g, start, k=0):
     a dict from which paths (u->v) can be found.
     """
     k = len(g.vertices)-1 if k<1 else k
-    cost_row = defaultdict(lambda: float('inf'))
-    costs = {0: cost_row}
+    costs = {0: { v: float('inf') for v in g.vertices }}
     prevs = {v: (0, None) for v in g.vertices }
     costs[0][start] = 0
     for i in range(1, k+1):
