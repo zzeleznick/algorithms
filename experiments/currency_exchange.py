@@ -12,8 +12,8 @@ from Graph import *
 from utils import *
 from experiments.queue import PriorityQueue
 
-# DATA_FILE = "currencies.csv"
-DATA_FILE = "currencies_cycle.csv"
+DATA_FILE = "currencies.csv"
+# DATA_FILE = "currencies_cycle.csv"
 
 def load_data(fname = DATA_FILE):
     with open(fname) as infile:
@@ -38,7 +38,7 @@ def ck_bellman_ford(g, start, k=0):
     """
     k = len(g.vertices)-1 if k<1 else k
     costs = {0: { v: float('inf') for v in g.vertices }}
-    prevs = {v: (0, None) for v in g.vertices }
+    prevs = {v: (1, None) for v in g.vertices }
     costs[0][start] = 0
     for i in range(1, k+1):
         # iterate to find best paths through all vertices
@@ -58,40 +58,15 @@ def ck_bellman_ford(g, start, k=0):
             # print("Graph contains a negative-weight cycle"); break
     return (costs, prevs)
 
-def c_dijkstra(g, start, end):
-    visited = OD()
-    costs = {v: 0 for v in g.vertices }
-    prevs = {v: (1, None) for v in g.vertices }
-    costs[start] = g[start][end] # rate directly
-    fringe = PriorityQueue(costs, maxheap=True)
-    while fringe:
-        rate, node = fringe.pop() # pop the max element
-        if node in visited:
-            continue
-        visited[node] = True
-        for (v, w) in g[node].edges.iteritems():
-            pre_cost = rate * 1.0 / g[node][end]
-            next_cost = pre_cost * w * g[v][end]
-            if next_cost > costs[v]:
-                print("Update: %s -> %s to %s from %s" % (node, v, next_cost, costs[v]))
-                print("Pre_cost: %s, w: %s, to $: %s" % (pre_cost, w,g[v][end] ))
-                costs[v] = next_cost
-                prevs[v] = (log10(w), node)
-                fringe[v] = next_cost
-    print("Visited %s nodes" % len(visited))
-    return (costs, prevs)
-
 def main():
     g = make_graph()
     # print(g.adjacency_map)
     u,v = "Gold", "Dollar"
-    # costs, prevs = c_dijkstra(g, u, v)
     costs, prevs = ck_bellman_ford(g, u)
     print(costs)
     print(prevs)
     cost, path = get_path(prevs, v, u)
     print(10**(-cost))
-    # print(10**(cost))
     print(path)
 
 if __name__ == '__main__':
