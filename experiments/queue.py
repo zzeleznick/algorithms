@@ -8,7 +8,8 @@ from TimeUtils import *
 
 class PriorityQueue(object):
     NULL = '<null-item>' # placeholder for a removed item
-    def __init__(self, items=[]):
+    def __init__(self, items=[], maxheap=False):
+        self._maxheap = maxheap # whether to return lowest value on pop
         self.heap = []   # list of items arranged in a heap
         self.mapping = OD() # mapping of items to heap
         self.counter = itertools.count() # unique sequence count
@@ -16,8 +17,15 @@ class PriorityQueue(object):
             [ self.insert(k,v) for (k,v) in items.iteritems() ]
         else:
             [ self.insert(k) for (k) in items]
+    @property
+    def weight(self):
+        """Allows for max heap to flip signs"""
+        return (1-2*int(self._maxheap))
+    @property
+    def items(self):
+        return [ self[k][-1] for (p,c,k) in self.heap if k is not self.NULL ]
     def __repr__(self):
-        return repr(self.heap)
+        return repr(self.items)
     def __len__(self):
         return len(self.mapping)
     def __iter__(self):
@@ -28,6 +36,7 @@ class PriorityQueue(object):
         self.insert(key, value)
     def insert(self, item, priority=0):
         'Add a new item or update the priority of an existing item'
+        priority = self.weight * priority
         if item in self.mapping:
             self.remove(item)
         count = next(self.counter)
@@ -42,6 +51,7 @@ class PriorityQueue(object):
         'Remove and return the lowest priority item. Raise KeyError if empty.'
         while self.heap:
             priority, count, item = heappop(self.heap)
+            priority = self.weight * priority
             if item is not self.NULL:
                 del self.mapping[item]
                 return (priority, item)
@@ -105,6 +115,38 @@ def test_queue():
     queue_remove(a, 9)
     print a
 
+def test_priority_queue():
+    q = PriorityQueue(range(12))
+    print q
+    for i in q.items:
+        assert q[i][-1] == i, "q did not assemble correctly"
+    q[0] = 10
+    assert q[0][0] == 10 and q[0][1] == 12,  "q did not set correctly"
+    p, el = q.pop()
+    assert p == 0 and el == 1, "q did not pop correctly"
+    print q
+    q[20] = -10
+    print q
+    p, el = q.pop()
+    assert el == 20 and p == -10, "q did not pop correctly"
+    print "Success"
+
+def test_max_priority_queue():
+    q = PriorityQueue(range(12), maxheap=True)
+    print q
+    for i in q.items:
+        assert q[i][-1] == i, "q did not assemble correctly"
+    q[0] = 10
+    assert q[0][0] == -10 and q[0][1] == 12,  "q did not set correctly"
+    p, el = q.pop()
+    assert el == 0 and p == 10, "q did not pop correctly"
+    print q
+    q[20] = -10
+    print q
+    p, el = q.pop()
+    assert el == 1 and p == 0, "q did not pop correctly"
+    print "Success"
+
 def test_perf(size=10**4):
     q = deque(range(size))
     @timer
@@ -140,6 +182,7 @@ if __name__ == '__main__':
     test_perf = testcase(test_perf)
     test_native_perf = testcase(test_native_perf)
     benchmark_queue = testcase(benchmark_queue)
-
-    call_tests([2], verbose=False)
+    test_priority_queue = testcase(test_priority_queue)
+    test_max_priority_queue = testcase(test_max_priority_queue)
+    call_tests([3, 4], verbose=False)
     show_stack()
