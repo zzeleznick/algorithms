@@ -11,17 +11,17 @@ def generate_graph(v, e):
         1. No self-pointing edges
     """
     import numpy as np
-    adjency_matrix = np.zeros((v,v))
+    adjacency_matrix = np.zeros((v,v))
     graph = {i: {} for i in range(v)}
     filled = 0
     while filled <= e:
         x, y = random.randint(0,v-1), random.randint(0,v-1)
         if x != y and not graph[x].get(y):
             graph[x][y] = True
-            adjency_matrix[x][y] = 1
+            adjacency_matrix[x][y] = 1
             filled += 1
-    print(adjency_matrix)
-    return adjency_matrix
+    print(adjacency_matrix)
+    return adjacency_matrix
 
 def calc_indegrees(graph):
     indegrees = Counter()

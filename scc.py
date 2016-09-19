@@ -78,7 +78,7 @@ def test():
 @timer
 def test_2():
     names = ["A", "B", "C", "D", "E", "F", "G", "H"]
-    g = TimeableGraph([Vertex(i) for i in names])
+    g = TimeableGraph(names)
     g.add_edge(names[0], names[1])
     g.add_edge(names[0], names[2])
     g.add_edge(names[0], names[3])

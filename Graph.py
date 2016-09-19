@@ -1,6 +1,7 @@
 from __future__ import print_function
 import random
 from itertools import chain
+from collections import Mapping, Iterable
 from collections import OrderedDict as OD
 
 from TimeUtils import *
@@ -33,9 +34,9 @@ class Vertex(object):
     def _add_edge(self, name, weight=1):
         self._edges[name] = weight
     @classmethod
-    def _is_valid(cls, v):
+    def validate(cls, v):
         if not issubclass(type(v), Vertex):
-            raise Exception("Tried to add an invalid vertex of type %s" % type(v))
+            return False
         return True
     @property
     def edges(self):
@@ -45,18 +46,32 @@ class Graph(object):
     """Graph class defaults"""
     # V, E, = 10, 15
     w_min, w_max = 1, 1
-    def __init__(self, vertices=[]):
-        self._vertices = OD({v.name: v for v in vertices if Vertex._is_valid(v)})
+    def __init__(self, elements=[]):
+        self._vertices = OD()
+        if isinstance(elements, Mapping):
+            vertices = [ Vertex(v) for v in elements.iterkeys() ]
+            self._vertices.update({v.name: v for v in vertices})
+            for (k, val) in elements.iteritems():
+                if isinstance(val, Mapping):
+                    [ self.add_edge(k,v,w) for (v,w) in val.iteritems() ]
+                elif isinstance(val, Iterable):
+                    [ self.add_edge(k,v) for v in val ]
+                else:
+                    # Mapping value must be iterable!
+                    raise TypeError("Input non-iterable value in mapping.")
+        else:
+            vertices = [v if Vertex.validate(v) else Vertex(v) for v in elements]
+            self._vertices.update({v.name: v for v in vertices})
     def __getitem__(self, name):
         return self._vertices[name]
     def __repr__(self):
         f = lambda k,v: str((k, v.keys())) if len(v) > 0 else str((k, []))
-        return "\n".join(f(k,v) for (k,v) in self.adjancency_map.iteritems())
+        return "\n".join(f(k,v) for (k,v) in self.adjacency_map.iteritems())
     @property
     def vertices(self):
         return self._vertices
     @property
-    def adjancency_map(self):
+    def adjacency_map(self):
         """The adjaceny map remains a dynamic property"""
         return {v.name: v.edges for v in self._vertices.itervalues() }
     @property
@@ -157,6 +172,21 @@ class TimeableGraph(ReversibleGraph):
     def reverse(self):
         return super(TimeableGraph, self).reverse()
 
+def test_init():
+    print("Making a Graph from a generic range...")
+    g = Graph([i for i in range(5)])
+    print(g)
+    print("Making a Graph from an array of Vertices...")
+    g = Graph([Vertex(i) for i in range(5)])
+    print(g)
+    print("Making a Graph from a basic mapping...")
+    g = Graph({i: [j for j in range(i)] for i in range(10)})
+    print(g)
+    print("Making a Graph from a nested mapping...")
+    g = Graph({i: {j: i for j in range(i)} for i in range(10)})
+    print(g)
+    print(g.adjacency_map)
+
 def test_reverse():
     g = ReversibleGraph.generate(10,20)
     print(g)
@@ -184,6 +214,7 @@ def test_reverse_2():
         g.reverse()
 
 if __name__ == '__main__':
-    test_reverse_2 = testcase(test_reverse_2)
+    # test_reverse_2 = testcase(test_reverse_2)
+    test_init = testcase(test_init)
     call_tests()
     show_stack()
