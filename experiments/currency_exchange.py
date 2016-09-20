@@ -60,6 +60,7 @@ def ck_bellman_ford(g, start, k=0):
 
 def main():
     g = make_graph()
+    g.display()
     # print(g.adjacency_map)
     u,v = "Gold", "Dollar"
     costs, prevs = ck_bellman_ford(g, u)

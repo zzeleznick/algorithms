@@ -11,3 +11,4 @@ build/
 ref/
 logs/
 *.log
+*.output/

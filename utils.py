@@ -13,6 +13,7 @@ class FileManager(object):
     outname = "testGraph"
     def __enter__(self):
         os.chdir(self.dest)
+        return self
     def __exit__(self, type, value, traceback):
         os.chdir(self.home)
     @classmethod
