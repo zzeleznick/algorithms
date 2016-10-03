@@ -29,7 +29,15 @@ def calc_indegrees(graph):
         indegrees.update(v.edges.keys())
     return indegrees
 
-def topsort(graph):
+def calc_indegrees_2(g):
+    indegrees = Counter()
+    for ((u,v), w) in g.edgelist:
+        # increment indegree for v by 1
+        indegrees.update({v})
+    return indegrees
+
+def topsort(g):
+    graph = deepcopy(g)
     indegrees = calc_indegrees(graph)
     sources = deque([v for v in graph.vertices if v not in indegrees])
     visited = []
@@ -37,16 +45,17 @@ def topsort(graph):
         name = sources.popleft()
         visited.append(name)
         edges = graph[name].edges.keys()
-        [ graph.remove_edge(name, e) for e in edges ]
+        [ graph.remove_edge(name, v) for v in edges ]
         indegrees = calc_indegrees(graph)
-        for e in edges:
-            if not indegrees[e]:
-                sources.append(e)
+        for v in edges:
+            if not indegrees[v]:
+                sources.append(v)
     if len(visited) != len(graph.vertices):
         # there is a cycle!
         print("Topsort not possible for this graph")
-    else:
-        print(visited)
+        return None
+    print(visited)
+    return visited
 
 def topsort_2(original_graph):
     """Topsorts and then finds the longest path"""

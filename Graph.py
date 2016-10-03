@@ -16,7 +16,7 @@ class Vertex(object):
     """
     def __init__(self, name, value=None):
         self.name = name
-        self.value = name if (type(name) == int and value == None) else 1
+        self.value = name if (type(name) == int and value == None) else value
         self._edges = OD()
     def __setitem__(self, name, value):
         if value:

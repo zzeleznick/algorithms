@@ -60,7 +60,10 @@ def dijkstra(g, start, goal=None):
                 heappush(fringe, (next_cost, v))
                 # fringe[v] = next_cost
     print("Visited %s nodes" % len(visited))
-    return (costs, prevs)
+    if not search:
+        return (costs, prevs)
+    print("No path to %s nodes" % len(visited))
+    return (0, None)
 
 @testcase
 @timer
