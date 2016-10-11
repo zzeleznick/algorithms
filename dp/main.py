@@ -74,14 +74,14 @@ def translate(d,s,t_d):
     path = DFS(g, 0, size)
     out = []
     if path:
-        print("Found path: %s" % path)
+        # print("Found path: %s" % path)
         prev = None
         for (k, idx) in enumerate(path):
             if k != 0:
                 word = s[prev:idx]
                 human_word = d[word]
                 out.append(human_word)
-                print("%s: %s" % (word, human_word))
+                # print("%s: %s" % (word, human_word))
             prev = idx
     return " ".join(out)
 
@@ -98,16 +98,9 @@ def num_interpretations(d,s,t_d):
     start = 0
     path_count = {i: 0 for i in range(size+1) }
     path_count[start] = 1
-    """
-    ordered_vertices = topsort(g)
-    if not ordered_vertices:
-        return None
-    """
     od_edges = OD()
     for v in range(size+1):
         od_edges.update(dict(g._get_mono_edgelist(g[v])))
-        # sorted(g._get_mono_edgelist(g[v]), key=lambda x: x[0][1])
-    # print(od_edges)
     visited = {start: True}
     for (u,v) in od_edges:
         if u in visited:
@@ -155,10 +148,8 @@ with open(output_translate_file,'w') as f:
     for query in queries:
         answer = translate(d,query,t_d)
         f.write(str(answer)+"\n")
-        # exit(1)
 with open(output_num_interpretations_file,'w') as f:
     for query in queries:
         answer = num_interpretations(d,query,t_d)
         f.write(str(answer)+"\n")
-        # exit(1)
 
