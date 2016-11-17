@@ -25,8 +25,8 @@ class FileManager(object):
         padded_id = cls.gen_fileid()
         return "%s-%s.md" % (cls.outname, padded_id)
     @classmethod
-    def display(cls, caller):
-        fname = cls.gen_filename()
+    def display(cls, caller, fname=None):
+        fname = cls.gen_filename() if not fname else fname
         rpath = fname + ".png"
         with open(fname, "w") as outfile:
             outfile.write("graph TD;\n")

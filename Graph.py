@@ -113,14 +113,14 @@ class Graph(object):
             [ fringe.append(k) for k in self[v].edges.keys() if k not in visited ]
         return False
 
-    def display(self):
+    def display(self, fname=None):
         style = lambda u, v, w: "\t%s-->%s;" % (u, v) if w == 1 else "\t%s -- %s -->%s;" % (u, w, v)
         row_gen = lambda u: "\n".join(style(u.name, v, w) for (v,w) in u.edges.items()) if u.edges else "\t%s" % u.name
         custom_labels = "\n".join("\t%s[%s]" % (k,v) for (k,v) in self._custom_labels.iteritems())
         body = "\n".join("%s" % r for r in (row_gen(v) for v in self._vertices.itervalues()) if r)
         full_gen = lambda: "\n".join([custom_labels, body])
         with FileManager() as FM:
-            FM.display(full_gen)
+            FM.display(full_gen, fname)
     @classmethod
     def set_weight_range(cls, low=1, hi=1):
         cls.w_min, cls.w_max = low, hi
@@ -151,15 +151,10 @@ class Graph(object):
         return cls.generate(v, e, allow_cycles=False)
 
 class ReversibleGraph(Graph):
-    def __init__(self, vertices=[]):
-        super(ReversibleGraph, self).__init__(vertices)
-        self._reversed = False
     def reverse(self):
         """Modifies our internal state and flips the direction of all edges"""
-        self._reversed = not self._reversed
-        # Now our edgelist will be reversed
         # We sort edges by first value (assuming scalar numeric names for vertices)
-        edges = sorted(self.edgelist)
+        edges = self.edgelist
         # delete all previous edges
         self.remove_all_edges()
         # now add the reversed edges

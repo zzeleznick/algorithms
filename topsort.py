@@ -29,13 +29,6 @@ def calc_indegrees(graph):
         indegrees.update(v.edges.keys())
     return indegrees
 
-def calc_indegrees_2(g):
-    indegrees = Counter()
-    for ((u,v), w) in g.edgelist:
-        # increment indegree for v by 1
-        indegrees.update({v})
-    return indegrees
-
 def topsort(g):
     graph = deepcopy(g)
     indegrees = calc_indegrees(graph)
@@ -80,9 +73,7 @@ def topsort_2(original_graph):
         print("Topsort not possible for this graph")
     else:
         print("Topsort (name, level):\n%s" % visited.items())
-        max_path = calc_max_path_2(original_graph, level_map)
-        print("Longest Path:\n%s" % max_path)
-        original_graph.display()
+        return calc_max_path_2(original_graph, level_map)
 
 def first(gen):
     try:
@@ -133,7 +124,9 @@ def main():
     V = 10 # number of nodes
     E = 8 # number of edges
     graph = Graph.generate_DAG(V,E)
-    topsort_2(graph)
+    path = topsort_2(graph)
+    print("Longest Path:\n%s" % path)
+    graph.display()
 
 if __name__ == '__main__':
     main()
