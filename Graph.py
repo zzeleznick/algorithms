@@ -46,8 +46,9 @@ class Graph(object):
     """Graph class defaults"""
     # V, E, = 10, 15
     w_min, w_max = 1, 1
-    def __init__(self, elements=[]):
+    def __init__(self, elements=[], custom_labels={}):
         self._vertices = OD()
+        self._custom_labels = custom_labels
         if isinstance(elements, Mapping):
             vertices = [ Vertex(v) for v in elements.iterkeys() ]
             self._vertices.update({v.name: v for v in vertices})
@@ -115,7 +116,9 @@ class Graph(object):
     def display(self):
         style = lambda u, v, w: "\t%s-->%s;" % (u, v) if w == 1 else "\t%s -- %s -->%s;" % (u, w, v)
         row_gen = lambda u: "\n".join(style(u.name, v, w) for (v,w) in u.edges.items()) if u.edges else "\t%s" % u.name
-        full_gen = lambda: "\n".join("%s" % r for r in (row_gen(v) for v in self._vertices.itervalues()) if r)
+        custom_labels = "\n".join("\t%s[%s]" % (k,v) for (k,v) in self._custom_labels.iteritems())
+        body = "\n".join("%s" % r for r in (row_gen(v) for v in self._vertices.itervalues()) if r)
+        full_gen = lambda: "\n".join([custom_labels, body])
         with FileManager() as FM:
             FM.display(full_gen)
     @classmethod
